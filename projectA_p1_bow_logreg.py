@@ -80,11 +80,11 @@ if __name__ == '__main__':
 # Define a simple BoW vectorizer
 vectorizer = CountVectorizer(
     lowercase=True,          # convert to lowercase
-    stop_words=None,    # drop stopwords
-    min_df=2,                # ignore rare words (appearing in <5 docs)
-    max_df=0.9,              # ignore overly common words (>60% docs)
-    binary=False,             # use counts, not just presence
-    ngram_range=(1,2)
+    stop_words=None,         # keep stopwords
+    min_df=2,                # ignore rare words (appearing in <2 docs)
+    max_df=0.9,              # ignore overly common words (>90% docs)
+    binary=False,            # use counts, not just presence
+    ngram_range=(1,2)        # add bigrams
 )
 
 # Get features and labels
@@ -216,18 +216,15 @@ y_val_true = y[val_idx]
 y_val_pred = y_val_pred  # from earlier
 y_val_proba = best_model.predict_proba(X_bow[val_idx])[:, 1]
 
-# Attach metadata for inspection
 val_df = y_train_df.iloc[val_idx].copy()
 val_df["predicted"] = y_val_pred
 val_df["true"] = y_val_true
 val_df["prob_ks4_5"] = y_val_proba
 val_df["text"] = x_train_df.iloc[val_idx]["text"].values
 
-# Misclassifications
 misclassified = val_df[val_df["predicted"] != val_df["true"]]
 print(f"Total misclassified: {len(misclassified)} / {len(val_df)}")
 
-# Look at the first few
 for i, row in misclassified.head(5).iterrows():
     print("="*80)
     print(f"Title: {row['title']}  |  Author: {row['author']}")
