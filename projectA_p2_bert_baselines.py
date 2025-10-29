@@ -133,8 +133,8 @@ def main():
     best.fit(Xtr, y)
     yproba_test = best.predict_proba(Xte)[:,1]
     # Save provisional name; rename to yproba2_test.txt yourself for submission
-    np.savetxt("yproba1_test.txt", yproba_test, fmt="%.6f")
-    print("Wrote provisional probabilities to yproba1_test.txt. Rename to yproba2_test.txt before submitting Problem 2.")
+    np.savetxt("yproba2_test.txt", yproba_test, fmt="%.6f")
+    print("Wrote provisional probabilities to yproba2_test.txt. Rename to yproba2_test.txt before submitting Problem 2.")
 
 if __name__ == "__main__":
     main()
