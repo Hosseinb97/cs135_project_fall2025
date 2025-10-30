@@ -15,7 +15,7 @@ import os
 import textwrap
 
 # --- force script to run in its own folder ---
-os.chdir(r"C:\Users\hbazda01\OneDrive - Tufts\CEE PhD @TUFTS\Fall 2025\intro to ml-cs135\Proj A") ###!!!! note 4 AJ: CHANGE THIS TO YOUR OWN PATH !!!!###
+#os.chdir(r"C:\Users\hbazda01\OneDrive - Tufts\CEE PhD @TUFTS\Fall 2025\intro to ml-cs135\Proj A") ###!!!! note 4 AJ: CHANGE THIS TO YOUR OWN PATH !!!!###
 
 
 #read data using code from given snippet
