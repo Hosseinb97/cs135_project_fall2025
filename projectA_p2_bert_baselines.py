@@ -39,17 +39,18 @@ def load_xyH(data_dir):
 def get_estimator_and_grid(name):
     if name == "logistic":
         from sklearn.linear_model import LogisticRegression
-        est = LogisticRegression(max_iter=1000, solver="liblinear")
-        grid = {"C":[0.01, 0.1, 1.0, 3.0, 10.0], "penalty":["l2","l1"]}
+        est = LogisticRegression(max_iter=1000, solver="liblinear", class_weight='balanced')
+        grid = {"C":np.logspace(-3,2,10), "penalty":["l2","l1"]}
         key = "C"
     elif name == "linear_svm":
         base = LinearSVC(dual=False)
         est = CalibratedClassifierCV(base, cv=5)
-        grid = {"base_estimator__C":[0.01, 0.1, 1.0, 3.0, 10.0]}
+        grid = {"base_estimator__C":np.logspace(-3,2,10)}
         key = "base_estimator__C"
     elif name == "mlp":
-        est = MLPClassifier(max_iter=200)
-        grid = {"hidden_layer_sizes":[(64,), (128,), (256,)], "alpha":[1e-4, 1e-3, 1e-2]}
+        est = MLPClassifier(max_iter=2000, early_stopping=True, activation='relu')
+        grid = {"hidden_layer_sizes":[(128,), (256,), (128,64), (256,128)], "alpha":[1e-5, 1e-4, 1e-3],
+                "learning_rate_init":[1e-3, 1e-4]}
         key = "hidden_layer_sizes"
     else:
         raise ValueError("Unknown clf name")
