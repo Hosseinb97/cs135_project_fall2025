@@ -1,0 +1,8 @@
+{
+  "best_params": {
+    "C": 0.003593813663804626,
+    "penalty": "l2"
+  },
+  "best_cv_auroc": 0.7794172212240491,
+  "clf": "logistic"
+}

@@ -144,7 +144,6 @@
 
 
 
-
 \begin{document}
 \CustomSection{Problem 1:}
 \subsection{Bag-of-Words Design Decision Description}
@@ -160,7 +159,7 @@ We again used sklearn's StratifiedKFold and GridSearchCV to perform cross valida
     \includegraphics[width=0.55\linewidth]{../p1_hyperparam_train_val_curve.png}
 \end{figure}
 \newpage
-Logistic Regression is a strong choice for determining reading level, as it deals well with sparse features and high dimensions that come with the bag of words data representation. We explored both L1 and L2 regularization as well as 7 regularization strengths spaced over the domain $10^-3$ to $10^3$. The type of regularization affects whether weights will end up as zero (feature gets ignored) or not. We found that L2 performed slightly better, which makes sense, as we wanted words with little weight to still affect the model's prediction and not simply be ignored. For C, a higher value will penalize the weights less than a low value, and it is used to prevent overfitting. The optimal C value fell at 1, where validation AUROC just started to plateau. The model was trained with the liblinear solver from sklearn. No convergence issues were had, as we set the max iterations to 1000. Our final model's parameters were L2 regularization with a C value of 1.0, found via searching over all 14 combinations of C values and both regularization patterns.
+Logistic Regression is a strong choice for determining reading level, as it deals well with sparse features and high dimensions that come with the bag of words data representation. We explored both L1 and L2 regularization as well as 7 regularization strengths spaced over the domain $10^-3$ to $10^3$. The type of regularization affects whether weights will end up as zero (feature gets ignored) or not. We found that L2 performed slightly better, which makes sense, as we wanted words with little weight to still affect the model's prediction and not simply be ignored. For C, a higher value will penalize the weights less than a low value, and it is used to prevent overfitting. The optimal C value fell at 1, where validation AUROC just started to plateau just under 0.8. The model was trained with the liblinear solver from sklearn. No convergence issues were had, as we set the max iterations to 1000. Our final model's parameters were L2 regularization with a C value of 1.0, found via searching over all 14 combinations of C values and both regularization patterns.
 
 \subsection{Analysis of Predictions for the Best Classifier}
 
@@ -172,8 +171,7 @@ Logistic Regression is a strong choice for determining reading level, as it deal
 Our model tended to over-predict readings as higher level, as shown in the confusion matrix. Looking at the average length of the misclassified texts, they appear to be the same (around 79 words). We did notice, however, that the most misclassified authors wrote lower level texts in much older english, such that the model perceived the old words to mean the text was more difficult than reality. Authors like M. G. Lewis and Robert Louis Stevenson were classified incorrectly often and happened to write around the 18th century. The model tends to perform poorly on documents with a low score but historical language.
 
 \subsection{Report of Performance}
-
+Our model's ultimate test set performance received an AUROC of 0.689 which is lower than the ~0.79 on train data. This likely means that the performance on validation splits overestimated the model's ability to generalize to new data, meaning that the model overfit to the train data. Overall, the search procedure gave a rough but imperfect estimate of model performance.
 
 \CustomSection{Problem 2:}
 \end{document}
-
