@@ -195,11 +195,14 @@ No additional normalization or feature concatenation was applied in this baselin
 
 \subsection{Cross Validation Design}
 
-To evaluate and select the best classifier configuration, we used a {{K}}-fold StratifiedGroupKFold cross-validation procedure with author-level grouping.
+To evaluate and select the best classifier configuration, we used a 5-fold \texttt{StratifiedGroupKFold} cross-validation procedure with author-level grouping.
+This ensured that no author’s writing style appeared in both the training and validation folds, preventing information leakage between sets.
+Each fold trained on roughly 80\% of the data and validated on the remaining 20\%.
 The evaluation metric was the Area Under the ROC Curve (AUROC), chosen because it is threshold-independent and matches the leaderboard metric.
-We performed hyperparameter tuning via GridSearchCV, which exhaustively searched across the specified parameter grid and automatically refit the best model on the full training data.
-All models were trained exclusively on the provided x\_train.csv and y\_train.csv data; test data were used only for final leaderboard prediction.
 
+Hyperparameter tuning was performed using \texttt{GridSearchCV}, which exhaustively searched across the specified parameter grid and automatically refit the best-performing model on the full training data.
+Within each fold, AUROC was computed on the validation subset, and the mean AUROC across all five folds determined the best hyperparameter configuration.
+All models were trained exclusively on the provided \texttt{x\_train.csv} and \texttt{y\_train.csv} data; test data were reserved solely for final leaderboard prediction.
 
 \subsection{Classifier and Hyperparameter Search}
 
