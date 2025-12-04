@@ -42,9 +42,9 @@ data_train_valid = Dataset.load_from_df(df_train_valid[["user", "item", "rating"
 # 2. GRID SEARCH FOR BEST SVD (Problem 2b)
 # ============================================================
 param_grid = {
-    "n_factors": [20, 50, 80, 120],
-    "lr_all": [0.002, 0.005],
-    "reg_all": [0.02, 0.05]
+    "n_factors": [20, 50, 80, 120, 150],
+    "lr_all": [0.002, 0.005, 0.007],
+    "reg_all": [0.05, 0.1, 0.2, 0.4]
 }
 
 print("Running SVD GridSearch...")
