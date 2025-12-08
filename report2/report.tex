@@ -151,6 +151,10 @@
 % What happens as K increases?
 % How does best val performace change as K changes?
 % What step size and why?
+Figure 1a. RMSE vs. epoch for latent-factor models with K = 2, 10, and 50 and no regularization (alpha = 0).
+Across all three panels, training RMSE decreases steadily while validation RMSE decreases initially and then stabilizes. (i) As K increases, model capacity increases, reducing underfitting: K=2 shows clear underfitting with both train and validation RMSE plateauing early; K=10 improves substantially; K=50 achieves the lowest training error but also exhibits the strongest separation between train and validation curves, indicating emerging overfitting.
+(ii) Validation RMSE improves monotonically from K=2 → K=10 → K=50, though the marginal improvement decreases as K grows
+#####(iii) A step size of ?? was used. Smaller learning rates failed to produce meaningful learning due to small gradient magnitudes, while larger values led to unstable updates. Step size 0.5 provided stable convergence across all K values.
 
 \begin{figure}[H]
     \centering
@@ -161,6 +165,11 @@
 % what is alpha with K = 50? how did we choose?
 % what is step size?
 % is val error better than with alpha 0 for K == 50
+
+Figure 1b. RMSE vs. epoch for the K = 50 model with the best regularization strength (α = 0.0001).
+(i) Several α values were tested (α ∈ {0, 1e−5, 1e−4, 2e−4, 1e−3}); α = 1e−4 achieved the lowest validation RMSE and was therefore selected.
+(ii) The same step size 0.5 was used to maintain consistency and ensure fast but stable convergence.
+(iii) Compared to the unregularized K=50 trace from 1a, this alpha value improves validation performance, reducing overfitting and yielding a visibly tighter alignment between train and validation RMSE curves.
 
 \begin{figure}[H]
     \centering
@@ -174,11 +183,18 @@
 % does ranking change when using MAE, why?
 
 % PUT TABLE HERE
+Table 1c. RMSE and MAE on train, validation, and test splits for the best versions of each LF model: K = 2, 10, 50 (α = 0), and K = 50 with the best regularization (α = 0.0001).
+The table summarizes the relative performance of the latent factor models across capacities and regularization levels.
 
+Discussion.
+Focusing on RMSE, the recommended model is K = 50 with α = 0.0001, which achieves the lowest validation error among all configurations. Increasing K reduces underfitting, but unregularized K=50 begins to overfit; introducing α moderates this and improves generalization.
+Using MAE instead of RMSE does not change the ranking: all metrics consistently favor the same best configuration (K = 50 with α = 0.0001), indicating robustness of the model selection.
 
 \subsection{1d:}
 % This is the scatter plot
 % caption mentions trends and what does/doesn't make sense
+Figure 1d. 2D embedding of selected movies learned by the best LF model (K = 50, α = 0.0001).
+The figure projects the 50-dimensional item vectors into two principal components. Several interpretable trends emerge: movies of similar genre or tone appear close together—for example, animated films cluster near each other, while sci-fi/adventure titles such as Star Wars, Return of the Jedi, and Indiana Jones form another grouping. Some films with mixed or atypical genre characteristics (e.g., The Shining, Nightmare Before Christmas) appear farther from large clusters, which is reasonable given their unique thematic profiles. Outliers likely reflect limitations of projecting 50 dimensions into two, where some semantic structure is inevitably lost.
 
 \begin{figure}[H]
     \centering
@@ -200,5 +216,34 @@
 
 \subsection{2d:}
 
+2a. Method Description (1–2 paragraphs, polished)
+
+For Problem 2, we developed a recommendation model using the Surprise library’s implementation of Singular Value Decomposition (SVD), a latent-factor collaborative filtering technique that extends the matrix-factorization ideas from Problem 1. SVD models each user and item with a learnable low-dimensional embedding and predicts ratings via a dot product with user/item bias adjustments. To select an appropriate model complexity, we performed a grid search over latent dimension sizes (n_factors ∈ {2, 10, 50, 100, 120, 150}), learning rates (lr_all), and regularization strengths (reg_all) using 3-fold cross-validation with mean absolute error (MAE) as the supervised metric. This follows best practices for hyperparameter tuning and avoids overfitting by evaluating candidate models on held-out folds.
+
+After identifying the best configuration—n_factors = 50, lr_all = 0.0075, reg_all = 0.1—we retrained the SVD model on the full training+validation split and evaluated it on the development test split and the leaderboard's masked dataset. All development and leaderboard predictions were generated using Surprise’s built-in predict() function. The grid-search, model training, and evaluation were implemented using Surprise’s GridSearchCV, Dataset, and SVD modules, following the workflow recommended in the official Surprise documentation.
+
+2b. Figure Caption (for your SVD hyperparameter plot)
+
+Figure 2b. Cross-validated MAE for SVD as a function of the latent dimension (n_factors), aggregated over all learning-rate and regularization settings tested.
+The curve shows that model capacity strongly influences error: small latent spaces (e.g., K=2 or 10) underfit and produce higher MAE, while performance improves as K increases, reaching its minimum near K = 50. Beyond K ≈ 100, the gains flatten, and the curve begins to fluctuate slightly, indicating diminishing returns and the onset of mild overfitting. This plot illustrates how model complexity affects bias–variance tradeoffs and justifies selecting n_factors = 50 as the best-performing configuration from the grid search.
+
+2c. Performance Table + Caption
+
+Table 2c:
+
+(i) The leaderboard MAE is slightly higher than the development test MAE, which is expected because the leaderboard set contains user–item pairs not seen during training and may reflect a different distribution of item popularity or sparsity patterns. Nevertheless, the relationship between dev-set and leaderboard performance is consistent: lower development MAE predicts better leaderboard scores.
+
+(ii) Compared to Problem 1’s latent-factor model, which is trained via SGD on observed entries, the Surprise SVD in Problem 2 benefits from a more mature optimization backend, bias terms calibrated through baseline estimates, and the ability to regularize hyperparameters more systematically. While both approaches use latent factorization, the Surprise SVD provides better tuned generalization and achieved lower MAE on the dev test split than the Problem-1 LF model, highlighting the value of principled hyperparameter search and the stronger inductive bias in Surprise’s implementation.
+
+2d. Discussion
+
+Pros and Cons.
+The SVD-based approach performs well on moderately sized collaborative filtering datasets, especially those like MovieLens where user–item matrices are relatively dense and contain meaningful latent structure. Its strengths include scalability, explicit regularization, and the ability to model global effects via user/item biases. However, the method is limited by its reliance on linear embeddings: it cannot easily capture non-linear interactions or complex user-item behavior patterns. Furthermore, SVD struggles with very sparse users or extremely cold-start items because embeddings for those entities are poorly estimated.
+
+Opportunities for Future Work.
+With more time, I would extend the model in two directions: (i) incorporate implicit feedback using methods like SVD++, which has been shown to significantly improve recommendation accuracy, especially on unseen user–item pairs; and (ii) explore KNNBaseline or hybrid ensembles that blend neighborhood-based and latent-factor predictions. Additional gains might be achieved by integrating item metadata (genres, year, tags) or user demographic information via feature-augmented factorization methods.
+
+Key Takeaways.
+This project clarified the practical differences between implementing a matrix-factorization model from scratch (Problem 1) and using a mature library with optimized routines (Problem 2). The experience reinforced core ML lessons on the importance of bias–variance tradeoffs, cross-validation for hyperparameter selection, regularization for controlling overfitting, and the unavoidable mismatch between development test performance and leaderboard behavior. More broadly, it demonstrated that high-quality recommendation systems require not only modeling sophistication but also careful data handling and rigorous evaluation workflows.
 
 \end{document}
